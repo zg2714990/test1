@@ -1,0 +1,115 @@
+dotnet WebApplication3.dll --server.urls="http://*:5000"
+
+
+
+systemctl status firewalld
+
+systemctl stop firewalld #关闭
+systemctl start firewalld #打开
+systemctl restart firewalld #重启
+systemctl disable firewalld #关闭开机启动
+systemctl enable firewalld #开机启动
+
+Nginx
+
+[Unit]
+Description=nginx
+After=network.target
+ 
+[Service]
+Type=forking
+ExecStart=/usr/local/nginx/sbin/nginx    #修改为自己系统对应的路径
+ExecReload=/usr/local/nginx/sbin/nginx -s reload #修改为自己系统对应的路径
+ExecStop=/usr/local/nginx/sbin/nginx -s quit    #修改为自己系统对应的路径
+PrivateTmp=true
+[Install]
+WantedBy=multi-user.target
+
+
+
+步骤
+1.进入**/usr/lib/systemd/system**
+
+cd /usr/lib/systemd/system
+
+2.创建nginx.service
+
+touch nginx.service
+
+3.vim编辑nginx.service，里面的路径根据自己实际情况修改
+# 添加nginx.service
+# vim /lib/systemd/system/nginx.service
+ 
+[Unit]
+Description=nginx service
+After=network.target 
+ 
+[Service] 
+Type=forking
+# 路径对应安装路径
+ExecStart=/usr/local/nginx/sbin/nginx
+ExecReload=/usr/local/nginx/sbin/nginx -s reload
+ExecStop=/usr/local/nginx/sbin/nginx -s quit
+PrivateTmp=true 
+[Install] 
+WantedBy=multi-user.target
+
+设置开机自启
+systemctl enable nginx.service
+想关闭运行命令
+
+systemctl disable nginx.service 
+
+
+停止nginx
+ 
+nginx -s stop
+ 
+重启nginx
+ 
+nginx -s reload
+
+
+服务命令
+systemctl start nginx.service   #开启
+systemctl stop nginx.service    #关闭
+systemctl reload nginx.service  #重新加载配置
+systemctl status nginx.service  #查看状态
+————————————————
+#########32
+
+cd /usr/local/nginx/sbin/
+./nginx
+./nginx -s stop
+./nginx -s quit
+./nginx -s reload
+
+./nginx -s quit:此方式停止步骤是待nginx进程处理任务完毕进行停止。
+./nginx -s stop:此方式相当于先查出nginx进程id再使用kill命令强制杀掉进程。
+
+查询nginx进程
+
+1
+2
+3
+4
+5
+ps aux|grep nginx
+
+重启 nginx
+1.先停止再启动（推荐）：
+对 nginx 进行重启相当于先停止再启动，即先执行停止命令再执行启动命令。如下：
+
+1
+2
+3
+4
+./nginx -s quit
+./nginx
+
+2.重新加载配置文件：
+当 ngin x的配置文件 nginx.conf 修改后，要想让配置生效需要重启 nginx，使用-s reload不用先停止 ngin x再启动 nginx 即可将配置信息在 nginx 中生效，如下：
+./nginx -s reload
+
+
+原文链接：https://blog.csdn.net/weixin_45808483/article/details/118657813
